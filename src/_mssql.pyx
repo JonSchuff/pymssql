@@ -227,9 +227,6 @@ cdef int err_handler(DBPROCESS *dbproc, int severity, int dberr, int oserr,
     cdef int _min_error_severity = min_error_severity
     cdef char mssql_message[PYMSSQL_MSGSIZE]
 
-    if severity < _min_error_severity:
-        return INT_CANCEL
-
     if dberrstr == NULL:
         dberrstr = ''
     if oserrstr == NULL:
@@ -241,7 +238,7 @@ cdef int err_handler(DBPROCESS *dbproc, int severity, int dberr, int oserr,
             "DBDEAD(dbproc) = %d\n", <void *>dbproc, severity, dberr,
             oserr, dberrstr, oserrstr, DBDEAD(dbproc));
         fprintf(stderr, "*** previous max severity = %d\n\n",
-            _mssql_last_msg_severity);
+            _mssql_last_msg_severity)
 
     mssql_lastmsgstr = _mssql_last_msg_str
     mssql_lastmsgno = &_mssql_last_msg_no
@@ -264,6 +261,9 @@ cdef int err_handler(DBPROCESS *dbproc, int severity, int dberr, int oserr,
         mssql_lastmsgseverity[0] = severity
         mssql_lastmsgno[0] = dberr
         mssql_lastmsgstate[0] = oserr
+
+    if severity < _min_error_severity:
+        return INT_CANCEL
 
     if oserr != DBNOERR and oserr != 0:
         if severity == EXCOMM:
